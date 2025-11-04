@@ -1,40 +1,67 @@
-// server.js
+// server.js — Render-ready, env-driven
 
+require('dotenv').config();
 const express  = require('express');
 const path     = require('path');
 const mongoose = require('mongoose');
+
+// Models
 const User     = require('./models/User');
 const Player   = require('./models/Player');
 const Pokedex  = require('./models/PlayerPokedex');
 
+// Front-end data (kept as-is from your project)
 const { POKEMON, CLOUDINARY_BASE } = require(path.join(__dirname, 'public/js/pokemonData'));
 const EVOLUTION_MAP = require(path.join(__dirname, 'public/js/evolutionData')).EVOLUTION_MAP;
 
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 5000;
 
-// ─── MongoDB Setup ─────────────────────────────────────────────────────────────
-mongoose.set('strictQuery', false);
-mongoose.connect(
-  'mongodb+srv://enocheiheilam:Enoch_24761022@cluster0.xknyzbq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
-  { useNewUrlParser: true, useUnifiedTopology: true }
-)
-.then(() => console.log('[DB] MongoDB connected'))
-.catch(err => {
-  console.error('[DB] Connection error:', err);
-  process.exit(1);
-});
+/* ────────────────────────── MongoDB Setup ────────────────────────── */
+(async () => {
+  try {
+    const mongoUri = process.env.MONGO_URI;
+    if (!mongoUri) {
+      console.error('❌ MONGO_URI is not set in environment variables');
+      process.exit(1);
+    }
 
-// ─── Middleware ────────────────────────────────────────────────────────────────
+    // Optional DB override if you want: set MONGO_DB in Render
+    const dbName = process.env.MONGO_DB || undefined;
+
+    mongoose.set('strictQuery', false);
+    await mongoose.connect(mongoUri, {
+      dbName,
+      autoIndex: process.env.NODE_ENV !== 'production'
+    });
+
+    console.log('✅ [DB] MongoDB connected');
+  } catch (err) {
+    console.error('❌ [DB] Connection error:', err);
+    process.exit(1);
+  }
+})();
+
+/* ───────────────────────── Middleware ───────────────────────── */
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ─── Serve Static Pages ───────────────────────────────────────────────────────
+/* ──────────────────────── Health / Config ──────────────────────── */
+// Health check for Render
+app.get('/healthz', (req, res) => res.status(200).json({ ok: true }));
+
+// Optional: expose only the Cloudinary cloud name to the client (no secrets)
+app.get('/config/cloudinary', (req, res) => {
+  res.json({ cloudName: process.env.CLOUDINARY_CLOUD_NAME || '' });
+});
+
+/* ─────────────────────── Serve Static Pages ─────────────────────── */
 app.get('/',         (req, res) => res.sendFile(path.join(__dirname, 'src/pages/starter.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'src/pages/register.html')));
 app.get('/login',    (req, res) => res.sendFile(path.join(__dirname, 'src/pages/login.html')));
 app.get('/select',   (req, res) => res.sendFile(path.join(__dirname, 'src/pages/select.html')));
+
 app.get('/game', async (req, res) => {
   const { userId } = req.query;
   if (!userId) return res.redirect('/login');
@@ -46,10 +73,11 @@ app.get('/game', async (req, res) => {
   }
   return res.sendFile(path.join(__dirname, 'src/pages/game.html'));
 });
+
 app.get('/pokedex', (req, res) => res.sendFile(path.join(__dirname, 'src/pages/pokedex.html')));
 app.get('/shop',    (req, res) => res.sendFile(path.join(__dirname, 'src/pages/shop.html')));
 
-// ─── Helper: ensure a Player & Pokedex record exists ──────────────────────────
+/* ───── Helper: ensure a Player & Pokedex record exists (unchanged) ───── */
 async function ensurePlayer(username) {
   let p = await Player.findOne({ username });
   if (!p) {
@@ -74,7 +102,8 @@ async function ensurePlayer(username) {
   return p;
 }
 
-// ─── REGISTER ──────────────────────────────────────────────────────────────────
+/* ─────────────────────────── AUTH ─────────────────────────── */
+// REGISTER
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -90,7 +119,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// ─── LOGIN ─────────────────────────────────────────────────────────────────────
+// LOGIN
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -106,7 +135,8 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// ─── SELECT STARTER ────────────────────────────────────────────────────────────
+/* ───────────────────────── Game APIs ───────────────────────── */
+// SELECT STARTER
 app.post('/select', async (req, res) => {
   const { userId, starterKey } = req.body;
   try {
@@ -140,7 +170,7 @@ app.post('/select', async (req, res) => {
   }
 });
 
-// ─── API: GET /progress?userId=… ───────────────────────────────────────────────
+// GET /progress?userId=…
 app.get('/progress', async (req, res) => {
   const { userId } = req.query;
   try {
@@ -174,7 +204,7 @@ app.get('/progress', async (req, res) => {
   }
 });
 
-// ─── API: POST /save ────────────────────────────────────────────────────────────
+// POST /save
 app.post('/save', async (req, res) => {
   const {
     userId,
@@ -221,7 +251,7 @@ app.post('/save', async (req, res) => {
   }
 });
 
-// ─── API: POST /reset ───────────────────────────────────────────────────────────
+// POST /reset
 app.post('/reset', async (req, res) => {
   const { userId, password } = req.body;
   try {
@@ -262,7 +292,7 @@ app.post('/reset', async (req, res) => {
   }
 });
 
-// ─── API: POST /open-chest ──────────────────────────────────────────────────────
+// POST /open-chest
 app.post('/open-chest', async (req, res) => {
   const { userId, count = 1 } = req.body;
   const numChests = Math.max(1, parseInt(count, 10) || 1);
@@ -295,8 +325,8 @@ app.post('/open-chest', async (req, res) => {
 
     const loops = firstUsed ? numChests - 1 : numChests;
     for (let i = 0; i < loops; i++) {
-      // ... shard rolls as before ...
-      // plus 1% rare mons, updating newOwned & Pokedex
+      // TODO: your original chest-roll logic goes here (shards + 1% rare mons)
+      // Update totalCommon/totalRare/newOwned and Pokedex as needed.
     }
 
     const ops = {
@@ -316,14 +346,14 @@ app.post('/open-chest', async (req, res) => {
     );
 
     return res.json({
-      success:        true,
-      newChestKeys:   updated.chestKeys,
-      newCommonShards: updated.shards.common,
-      commonGained:   totalCommon,
-      newRareShards:  updated.shards.rare,
-      rareGained:     totalRare,
-      gotRarePokemon: firstUsed,
-      rareKey:        firstUsed ? 'pikachu' : null
+      success:          true,
+      newChestKeys:     updated.chestKeys,
+      newCommonShards:  updated.shards.common,
+      commonGained:     totalCommon,
+      newRareShards:    updated.shards.rare,
+      rareGained:       totalRare,
+      gotRarePokemon:   firstUsed,
+      rareKey:          firstUsed ? 'pikachu' : null
     });
   } catch (err) {
     console.error('[API] /open-chest error:', err);
@@ -331,7 +361,7 @@ app.post('/open-chest', async (req, res) => {
   }
 });
 
-// ─── API: POST /buy-pokemon ────────────────────────────────────────────────────
+// POST /buy-pokemon
 app.post('/buy-pokemon', async (req, res) => {
   const { key: keyFromPayload, userId } = req.body;
   if (!keyFromPayload || !userId) {
@@ -392,7 +422,7 @@ app.post('/buy-pokemon', async (req, res) => {
   }
 });
 
-// ─── GET /api/pokedex/master ──────────────────────────────────────────────────
+// GET /api/pokedex/master
 app.get('/api/pokedex/master', (req, res) => {
   try {
     const master = Object.entries(POKEMON).map(([key, data]) => ({
@@ -400,14 +430,17 @@ app.get('/api/pokedex/master', (req, res) => {
       picUrl: `${CLOUDINARY_BASE}/${data.imageId}.png`,
       dexNumber: parseInt(data.imageId.split('_')[0], 10)
     })).sort((a,b) => a.dexNumber - b.dexNumber);
-    return res.json({ master: master.map(({key,name,rarity,picUrl}) => ({key,name,rarity,picUrl})) });
+
+    return res.json({
+      master: master.map(({key, name, rarity, picUrl}) => ({ key, name, rarity, picUrl }))
+    });
   } catch (err) {
     console.error('[API] /api/pokedex/master error:', err);
     return res.status(500).json({ error: 'Failed to build master Pokédex' });
   }
 });
 
-// ─── GET /api/pokedex/user ────────────────────────────────────────────────────
+// GET /api/pokedex/user
 app.get('/api/pokedex/user', async (req, res) => {
   const { userId } = req.query;
   if (!userId) return res.status(400).json({ success: false, message: 'Missing userId' });
@@ -435,7 +468,7 @@ app.get('/api/pokedex/user', async (req, res) => {
   }
 });
 
-// ─── POST /evolve-pokemon ─────────────────────────────────────────────────────
+// POST /evolve-pokemon
 app.post('/evolve-pokemon', async (req, res) => {
   const { userId, slotIndex } = req.body;
   if (typeof slotIndex !== 'number') {
@@ -472,7 +505,7 @@ app.post('/evolve-pokemon', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Not enough candy' });
     }
 
-    const newKey = evoInfo.evolvesTo;
+    const newKey   = evoInfo.evolvesTo;
     const newLevel = sl.level;
     const newExp   = sl.exp;
 
@@ -515,7 +548,7 @@ app.post('/evolve-pokemon', async (req, res) => {
   }
 });
 
-// ─── POST /evolve-bench ────────────────────────────────────────────────────────
+// POST /evolve-bench
 app.post('/evolve-bench', async (req, res) => {
   const { userId, pokemonKey } = req.body;
   if (!userId || !pokemonKey) {
@@ -588,7 +621,7 @@ app.post('/evolve-bench', async (req, res) => {
   }
 });
 
-// ─── POST /shop/buy-candy ─────────────────────────────────────────────────────
+// POST /shop/buy-candy
 app.post('/shop/buy-candy', async (req, res) => {
   const { userId, type } = req.body;
   if (!userId || (type !== 'rare' && type !== 'epic')) {
@@ -602,7 +635,7 @@ app.post('/shop/buy-candy', async (req, res) => {
     const p = await Player.findOne({ username: u.username });
     if (!p) return res.status(404).json({ success: false, message: 'Player missing' });
 
-    const owned    = p.candies[type]       || 0;
+    const owned    = p.candies[type]       || 0; // (kept for clarity; not directly used)
     const bought   = p.candiesBought[type] || 0;
     const price    = type === 'rare'
                    ? Math.round(500 * Math.pow(1.5, bought))
@@ -633,5 +666,5 @@ app.post('/shop/buy-candy', async (req, res) => {
   }
 });
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
+/* ───────────────────────── Start Server ───────────────────────── */
 app.listen(PORT, () => console.log(`[Server] Listening on port ${PORT}`));
