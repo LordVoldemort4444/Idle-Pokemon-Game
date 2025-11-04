@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Poké Shop</title>
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/shop.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Poké Shop</h1>
+    <h2 id="greeting">Welcome, —</h2>
+
+    <!-- Existing Shop Stats -->
+    <div class="shop-stats">
+      <div><strong>Money:</strong> <span id="moneyDisplay">0</span></div>
+      <div><strong>Chest Keys:</strong>   <span id="shopChestKeys">0</span></div>
+      <div><strong>Common Shards:</strong> <span id="shopCommonShards">0</span></div>
+      <div><strong>Rare Shards:</strong>   <span id="shopRareShards">0</span></div>
+    </div>
+
+    <!-- Buttons to open chests -->
+    <div class="open-chest-container">
+      <button id="openChestBtn" disabled>Open Chest (Cost: 1 Key)</button>
+      <button id="openTenBtn"   disabled>Open 10 Chests (Cost: 10 Keys)</button>
+    </div>
+
+    <!-- New Candy Section -->
+    <div class="candy-section" style="margin-top: 2rem;">
+      <h3>Candies</h3>
+      <div class="candy-stats">
+        <div>
+          <strong>Rare Candies:</strong>
+          <span id="rareCandyCount">0</span>
+        </div>
+        <div>
+          <strong>Epic Candies:</strong>
+          <span id="epicCandyCount">0</span>
+        </div>
+      </div>
+      <div class="buy-candy-buttons" style="margin-top: 1rem;">
+        <button id="buyRareCandyBtn" disabled>Buy Rare Candy (Cost: 0)</button>
+        <button id="buyEpicCandyBtn" disabled>Buy Epic Candy (Cost: 0)</button>
+      </div>
+    </div>
+
+    <!-- Message area for chest pops -->
+    <div id="shopMessage" class="shop-message"></div>
+
+    <!-- Back link -->
+    <div class="back-link" style="margin-top: 2rem;">
+      <a id="backToGame" href="#">← Back to Game</a>
+    </div>
+  </div>
+
+  <script src="/js/pokemonData.js"></script>
+  <script src="/js/shop.js"></script>
+</body>
+</html>

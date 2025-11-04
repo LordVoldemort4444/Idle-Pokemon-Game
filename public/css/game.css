@@ -1,0 +1,287 @@
+/* game.css */
+
+/* Container */
+.container {
+  position: relative;
+  max-width: 800px;
+  margin: 2rem auto;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Dispatch Notes */
+#dispatchWrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+#dispatchIcon {
+  font-size: 2rem;
+  cursor: pointer;
+}
+#dispatchNotes {
+  position: absolute;
+  top: 3rem;
+  right: 0;
+  width: 260px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  padding: 1rem;
+  display: none;
+  z-index: 100;
+}
+#dispatchNotes .notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+/* Stats & Tier */
+.stats,
+.trainer-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stats div,
+.trainer-stats div {
+  flex: 1;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+/* Slots Container */
+.slots-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Slot Controls */
+.slot-controls {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+.slot-controls h3 {
+  margin-top: 0;
+  color: #055e76;
+  text-align: center;
+}
+.slot-controls .slot-content {
+  flex: 1;
+}
+.slot-controls .slot-placeholder {
+  flex: 1;
+  display: none;
+  border: 2px dashed #bbb;
+  border-radius: 6px;
+  color: #999;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+}
+.slot-controls img.slot-img {
+  display: block;
+  margin: 0 auto 0.5rem;
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+.slot-controls button {
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+.slot-controls button:hover {
+  background-color: #1976d2;
+}
+.slot-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* highlight a slot when dragging over it */
+.slot-controls.drag-over {
+  outline: 3px dashed #2196f3;
+}
+
+/* Bench Grid */
+.bench-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+  border: 2px dashed #bbb;
+  min-height: 120px;
+  padding: 1rem;
+  border-radius: 8px;
+  position: relative;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.bench-grid:empty::before {
+  content: "Drag slot Pokémon here to unassign";
+  color: #999;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-style: italic;
+}
+/* highlight bench grid as a drop target */
+.bench-grid.drag-over {
+  border-color: #2196f3;
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.bench-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+}
+.bench-card img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+.bench-card div {
+  margin: 0.25rem 0;
+}
+.bench-card button {
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+.bench-card button:hover {
+  background-color: #1976d2;
+}
+.bench-card button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Controls */
+.controls button {
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+.controls button:hover {
+  background-color: #1976d2;
+}
+.controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+/* Headings */
+h1, h2, h3 {
+  color: #055e76;
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats,
+  .trainer-stats,
+  .slots-container,
+  .bench-grid,
+  .controls {
+    display: block;
+  }
+}
+
+/* make it target <button class="evolve-btn"> inside .slot-controls explicitly */
+.slot-controls button.evolve-btn {
+  background-color: purple;
+  color: #fff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Darken on hover (unless disabled) */
+.slot-controls button.evolve-btn:hover:not(:disabled) {
+  background-color: rebeccapurple;
+}
+
+/* Gray it out when disabled */
+.slot-controls button.evolve-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.slot-controls button.evolve-btn {
+  background-color: purple;
+  color: #fff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+
+/* 2) Bench‐area evolve buttons */
+.bench-card button.evolve-btn {
+  background-color: purple;
+  color: #fff;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Darken on hover (unless disabled) */
+.bench-card button.evolve-btn:hover:not(:disabled) {
+  background-color: rebeccapurple;
+}
+
+/* Gray it out when disabled */
+.bench-card button.evolve-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

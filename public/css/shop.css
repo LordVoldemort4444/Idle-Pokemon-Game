@@ -1,0 +1,172 @@
+/* shop.css */
+
+/* Container */
+.container {
+  position: relative;
+  max-width: 600px;
+  margin: 2rem auto;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #055e76;
+  margin-bottom: 1.5rem;
+}
+
+/* Shop Stats */
+.shop-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.shop-stats div {
+  flex: 1;
+  background: #f0f8ff;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #073642;
+}
+
+/* Open Chest Buttons */
+.open-chest-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.open-chest-container button {
+  background-color: #ffcc00;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin: 0 0.5rem;
+  color: #073642;
+}
+
+.open-chest-container button:hover:not(:disabled) {
+  background-color: #ffaa00;
+}
+
+.open-chest-container button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Shop Message */
+.shop-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #e0f7fa;
+  border: 1px solid #b2ebf2;
+  border-radius: 6px;
+  display: none;
+  color: #073642;
+}
+
+/* Back Link */
+.back-link {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.back-link a {
+  text-decoration: none;
+  color: #055e76;
+  font-weight: bold;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+/* ── New Candy Section Styling ───────────────────────────────────────────────── */
+
+/* Candy Section Container */
+.candy-section {
+  background-color: #fafafa;
+  border: 1px solid #dcdcdc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.candy-section h3 {
+  margin-bottom: 1rem;
+  color: #5a2d82;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+/* Candy Stats Display */
+.candy-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.candy-stats div {
+  flex: 1;
+  background: #ffffff;
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1rem;
+  color: #073642;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Buy Candy Buttons Container */
+.buy-candy-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Buy Candy Button Styles */
+.buy-candy-buttons button {
+  background-color: #8e44ad;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.buy-candy-buttons button:hover:not(:disabled) {
+  background-color: #732d91;
+}
+
+.buy-candy-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #b48fb6;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .shop-stats {
+    flex-direction: column;
+  }
+  .candy-stats {
+    flex-direction: column;
+  }
+  .buy-candy-buttons {
+    flex-direction: column;
+  }
+  .buy-candy-buttons button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Choose Starter</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <style>
+    .starter-grid {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .starter-card {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 200px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .starter-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .starter-card h2 {
+      margin: 0.5rem 0;
+      color: #055e76;
+    }
+    .starter-card button {
+      margin-top: auto;
+      background-color: #28a745;
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .starter-card button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pick Your Starter Pokémon</h1>
+    <div id="starterGrid" class="starter-grid"></div>
+  </div>
+  <script src="/js/pokemonData.js"></script>
+  <script src="/js/select.js"></script>
+</body>
+</html>

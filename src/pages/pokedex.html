@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pokédex</title>
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/game.css">
+
+  <style>
+    .pokedex-container {
+      padding: 2rem;
+    }
+    #backBtn {
+      margin-bottom: 1rem;
+    }
+    #greeting {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      color: #055e76;
+    }
+    .shards-display {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    .rarity-section {
+      margin-bottom: 2rem;
+    }
+    .rarity-section h2 {
+      text-transform: capitalize;
+      margin-bottom: 1rem;
+    }
+    .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .pokemon-card {
+      position: relative;
+      flex: 1 1 calc(25% - 1rem);
+      background-color: rgba(255,255,255,0.9);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .pokemon-card.owned {
+      border: 2px solid #4caf50;
+      transform: scale(1.02);
+      opacity: 1;
+    }
+    .pokemon-card.not-owned {
+      opacity: 0.4;
+    }
+    .pokemon-card img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 0.5rem;
+    }
+    .pokemon-card button.buy-btn {
+      margin-top: 0.5rem;
+      background-color: #f39c12;
+      color: #fff;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      width: 100%;
+    }
+    .pokemon-card button.buy-btn:hover {
+      background-color: #d6870a;
+    }
+    .pokemon-card button.buy-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 800px) {
+      .pokemon-card {
+        flex: 1 1 calc(50% - 1rem);
+      }
+    }
+    @media (max-width: 500px) {
+      .pokemon-card {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container pokedex-container">
+    <h1>Pokédex</h1>
+    <h2 id="greeting">Welcome, —</h2>
+    <button id="backBtn" class="button login">⬅ Back to Game</button>
+
+    <div class="shards-display">
+      <strong>Common Shards:</strong> <span id="pokedexCommonShards">0</span> &nbsp;&nbsp;
+      <strong>Rare Shards:</strong>   <span id="pokedexRareShards">0</span>
+    </div>
+
+    <div id="pokedexSections"></div>
+  </div>
+
+  <script src="/js/pokemonData.js"></script>
+  <script src="/js/pokedex.js"></script>
+</body>
+</html>

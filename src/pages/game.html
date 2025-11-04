@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idle Pokémon</title>
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/game.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Patch Notes Trigger -->
+    <div id="dispatchWrapper">
+      <span id="dispatchIcon">🛈</span>
+      <div id="dispatchNotes">
+        <div class="notes-header">
+          <span>Patch Notes</span>
+          <button id="closeDispatch">×</button>
+        </div>
+        <ul>
+          <li><strong>02 Jun 2025</strong></li>
+          <li>Added user-friendly open 10 chests button in Shop!</li>
+          <li>Updated Chest Logic - You can now get Rare Shards in chests!</li>
+          <li>Rare Pokemons can now be bought with 20 Rare Shards in Pokedex!</li>
+          <li>Introduced live “Total Gain/sec” display on Game page showing combined money/sec and EXP/sec</li>
+        </ul>
+      </div>
+    </div>
+
+    <h1>Idle Pokémon</h1>
+    <h2 id="greeting">Welcome back, —</h2>
+
+    <!-- Core Resources -->
+    <div class="stats">
+      <div><strong>Money:</strong> <span id="money">0</span></div>
+      <div><strong>Chest Keys:</strong> <span id="chestKeys">0</span></div>
+    </div>
+
+    <!-- Total Gain/sec Panel -->
+    <div class="stats">
+      <div><strong>Total Money/sec:</strong> <span id="totalMoneyRate">0</span></div>
+      <div><strong>Total EXP/sec:</strong>   <span id="totalExpRate">0</span></div>
+    </div>
+
+    <!-- Trainer Tier & Total EXP -->
+    <div class="trainer-stats" style="margin:1.5rem 0;">
+      <div><strong>Trainer Tier:</strong> <span id="trainerTier">1</span></div>
+      <div><strong>Total EXP:</strong>
+        <span id="trainerExp">0.0</span> /
+        <span id="trainerExpNext">0.0</span>
+      </div>
+    </div>
+
+    <!-- Dynamic Slots Container -->
+    <div id="slotsContainer" class="slots-container"></div>
+
+    <!-- Bench Section -->
+    <div class="bench-section">
+      <h3>Bench Pokémons:</h3>
+      <div id="benchGrid" class="bench-grid"></div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="controls" style="margin-top:2rem;">
+      <button id="shopBtn">Shop</button>
+      <button id="pokedexBtn">Pokédex</button>
+      <button id="saveBtn">Save</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <!-- Pokémon data, evolution map & game logic -->
+  <script src="/js/pokemonData.js"></script>
+  <script src="/js/evolutionData.js"></script>
+  <script src="/js/game.js"></script>
+  <script>
+    if (shopBtn) {
+      shopBtn.onclick = () => {
+        const uid = new URLSearchParams(window.location.search).get('userId');
+        window.location.href = `/shop?userId=${uid}`;
+      };
+    }
+    if (pokedexBtn) {
+      pokedexBtn.onclick = () => {
+        const uid = new URLSearchParams(window.location.search).get('userId');
+        window.location.href = `/pokedex?userId=${uid}`;
+      };
+    }
+  </script>
+</body>
+</html>
