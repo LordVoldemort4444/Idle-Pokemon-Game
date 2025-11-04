@@ -1,82 +1,91 @@
 /**
  * scripts/backfillPokedex.js
  *
- * One‐time script to populate PlayerPokedex.seenKeys for all existing Player documents.
- * For each Player, it gathers:
- *   - All keys currently in player.ownedPokemons
- *   - All keys in player.slots (where slot.key !== null)
- * and then does a single $addToSet: { seenKeys: { $each: allKeys } }.
+ * One-time script to populate PlayerPokedex.seenKeys for all existing Player docs.
+ * It collects:
+ *  - keys in player.ownedPokemons
+ *  - keys present in player.slots[].key (non-null)
+ * Then performs $addToSet with $each.
  *
- * Usage:  node scripts/backfillPokedex.js
+ * Usage:
+ *   MONGO_URI="mongodb+srv://..." node scripts/backfillPokedex.js
+ * or define MONGO_URI in your .env (Render dashboard for server-side run)
  */
 
+require('dotenv').config();
 const mongoose = require('mongoose');
-const path     = require('path');
+const path = require('path');
 
-// Adjust this to match your actual connection URI if necessary:
-const MONGODB_URI =
-  'mongodb+srv://enocheiheilam:Enoch_24761022@cluster0.xknyzbq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
-// Load models (ensure paths are correct relative to project root)
-const Player   = require(path.join(__dirname, '../models/Player'));
-const Pokedex  = require(path.join(__dirname, '../models/PlayerPokedex'));
+// Load models (paths relative to project root)
+const Player  = require(path.join(__dirname, '../models/Player'));
+const Pokedex = require(path.join(__dirname, '../models/PlayerPokedex'));
 
 async function main() {
-  console.log('Connecting to MongoDB...');
-  await mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-  console.log('Connected.');
+  const mongoUri = process.env.MONGO_URI;
+  const dbName   = process.env.MONGO_DB || undefined;
+
+  if (!mongoUri) {
+    console.error('❌ MONGO_URI is not set. Provide it via env.');
+    process.exit(1);
+  }
 
   try {
-    // 1) Fetch all Players
-    const players = await Player.find({}, 'username ownedPokemons slots').lean();
-    console.log(`Found ${players.length} players.`);
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(mongoUri, {
+      dbName,
+      autoIndex: true
+    });
+    console.log('✅ Connected.');
 
-    let count = 0;
+    // Fetch Players (lean for performance)
+    const players = await Player.find({}, 'username ownedPokemons slots').lean();
+    console.log(`Found ${players.length} player(s).`);
+
+    let processed = 0;
 
     for (const p of players) {
       const username = p.username;
       if (!username) continue;
 
-      // 2) Collect all keys from ownedPokemons
       const ownedKeys = p.ownedPokemons ? Object.keys(p.ownedPokemons) : [];
-
-      // 3) Collect all keys from slots[].key (skip null/undefined)
-      const slotKeys = Array.isArray(p.slots)
-        ? p.slots.map(s => s.key).filter(k => k)
+      const slotKeys  = Array.isArray(p.slots)
+        ? p.slots.map(s => s && s.key).filter(Boolean)
         : [];
 
-      // 4) Merge into a single array (deduplication happens in $addToSet)
       const allKeys = Array.from(new Set([...ownedKeys, ...slotKeys]));
+
       if (allKeys.length === 0) {
-        // No Pokémon owned—still ensure a document exists so seenKeys stays empty
+        // Ensure an empty pokedex doc exists
         await Pokedex.updateOne(
           { username },
           { $setOnInsert: { username, seenKeys: [] } },
           { upsert: true }
         );
-        console.log(`[${username}]: no keys to seed, created blank Pokedex if missing.`);
-        count++;
+        console.log(`[${username}] no keys to seed; ensured blank Pokedex.`);
+        processed++;
         continue;
       }
 
-      // 5) Perform a single $addToSet with $each: allKeys
-      const update = await Pokedex.updateOne(
+      await Pokedex.updateOne(
         { username },
-        { 
+        {
           $addToSet: { seenKeys: { $each: allKeys } },
-          $setOnInsert: { username }  // create doc if not already present
+          $setOnInsert: { username }
         },
         { upsert: true }
       );
-      console.log(`[${username}]: seeded ${allKeys.length} key(s) into seenKeys.`);
-      count++;
+
+      console.log(`[${username}] seeded ${allKeys.length} key(s).`);
+      processed++;
     }
 
-    console.log(`Backfill complete. Processed ${count} players.`);
+    console.log(`✅ Backfill complete. Processed ${processed} player(s).`);
+    await mongoose.disconnect();
+    process.exit(0);
   } catch (err) {
-    console.error('Error during backfill:', err);
-  } finally {
-    mongoose.disconnect();
+    console.error('❌ Backfill failed:', err);
+    try { await mongoose.disconnect(); } catch {}
+    process.exit(1);
   }
 }
 
